@@ -855,7 +855,7 @@ with tab2:
         st.info("💡 Enter credentials to enable WhatsApp sending. Leave empty to just simulate processing.")
         twilio_sid = st.text_input("Twilio Account SID (Optional)", type="password")
         twilio_token = st.text_input("Twilio Auth Token (Optional)", type="password")
-        twilio_from = st.text_input("Twilio WhatsApp Number (Optional)", placeholder="+14155238886")
+        twilio_from = st.text_input("Twilio WhatsApp Number (Optional)", placeholder="8208648862")
     
     st.markdown("---")
     
@@ -867,7 +867,7 @@ with tab2:
         with col1:
             wa_message = st.text_area("Simulate WhatsApp Message", placeholder="Customer message here...")
         with col2:
-            wa_phone = st.text_input("Phone Number", placeholder="+1234567890")
+            wa_phone = st.text_input("Phone Number", placeholder="8208648862")
         
         process_wa = st.form_submit_button("Process WhatsApp Message", type="primary")
     
@@ -944,7 +944,7 @@ with tab3:
         st.info("💡 Enter SMTP credentials to enable email sending. Leave empty to just simulate processing.")
         smtp_server = st.text_input("SMTP Server (Optional)", placeholder="smtp.gmail.com")
         smtp_port = st.number_input("SMTP Port", value=587, min_value=1, max_value=65535)
-        from_email = st.text_input("From Email (Optional)", placeholder="support@yourcompany.com")
+        from_email = st.text_input("From Email (Optional)", placeholder="yashgajbhiye0212@gmail.com")
         email_password = st.text_input("Email Password/App Password (Optional)", type="password")
     
     st.markdown("---")
@@ -1436,3 +1436,4 @@ with st.sidebar:
             
             st.success("All data cleared!")
             st.rerun()
+
