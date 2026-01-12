@@ -11,4 +11,4 @@ html5lib
 lxml
 plotly
 altair
-sqlite3
+sqlite
