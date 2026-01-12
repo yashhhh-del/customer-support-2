@@ -518,21 +518,24 @@ def save_chat_to_db(chat_entry: Dict):
 
 def update_daily_analytics():
     """Update daily analytics in database"""
-    conn = st.session_state.db_conn
-    c = conn.cursor()
-    
-    today = datetime.now().strftime("%Y-%m-%d")
-    analytics = st.session_state.analytics
-    
-    # Calculate averages
-    bot_messages = [msg for msg in st.session_state.chat_history if msg['role'] == 'bot']
-    avg_response_time = sum(msg.get('response_time', 0) for msg in bot_messages) / len(bot_messages) if bot_messages else 0
-    avg_confidence = sum(msg.get('confidence', 0) for msg in bot_messages) / len(bot_messages) if bot_messages else 0
-    
-    c.execute('''INSERT OR REPLACE INTO analytics VALUES (?, ?, ?, ?, ?, ?)''',
-              (today, analytics['total_queries'], analytics['answered'], 
-               analytics['escalated'], avg_response_time, avg_confidence))
-    conn.commit()
+    try:
+        conn = st.session_state.db_conn
+        c = conn.cursor()
+        
+        today = datetime.now().strftime("%Y-%m-%d")
+        analytics = st.session_state.analytics
+        
+        # Calculate averages
+        bot_messages = [msg for msg in st.session_state.chat_history if msg.get('role') == 'bot']
+        avg_response_time = sum(msg.get('response_time', 0) for msg in bot_messages) / len(bot_messages) if bot_messages else 0
+        avg_confidence = sum(msg.get('confidence', 0) for msg in bot_messages) / len(bot_messages) if bot_messages else 0
+        
+        c.execute('''INSERT OR REPLACE INTO analytics VALUES (?, ?, ?, ?, ?, ?)''',
+                  (today, analytics.get('total_queries', 0), analytics.get('answered', 0), 
+                   analytics.get('escalated', 0), avg_response_time, avg_confidence))
+        conn.commit()
+    except Exception as e:
+        st.error(f"Error updating analytics: {str(e)}")
 
 def send_email_response(to_email: str, subject: str, message: str, smtp_config: dict) -> bool:
     """Send automated email response"""
@@ -1166,13 +1169,15 @@ with tab5:
     # Metrics row
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Total Queries", analytics['total_queries'])
+        st.metric("Total Queries", analytics.get('total_queries', 0))
     with col2:
-        st.metric("Answered", analytics['answered'])
+        st.metric("Answered", analytics.get('answered', 0))
     with col3:
-        st.metric("Escalated", analytics['escalated'])
+        st.metric("Escalated", analytics.get('escalated', 0))
     with col4:
-        resolution_rate = (analytics['answered'] / analytics['total_queries'] * 100) if analytics['total_queries'] > 0 else 0
+        total = analytics.get('total_queries', 0)
+        answered = analytics.get('answered', 0)
+        resolution_rate = (answered / total * 100) if total > 0 else 0
         st.metric("Resolution Rate", f"{resolution_rate:.1f}%")
     
     st.markdown("---")
@@ -1213,12 +1218,15 @@ with tab5:
     
     with col1:
         # Query Distribution
+        answered = analytics.get('answered', 0)
+        escalated = analytics.get('escalated', 0)
+        
         fig_queries = go.Figure(data=[
             go.Bar(
                 x=['Answered', 'Escalated'],
-                y=[analytics['answered'], analytics['escalated']],
+                y=[answered, escalated],
                 marker_color=['#2ecc71', '#e74c3c'],
-                text=[analytics['answered'], analytics['escalated']],
+                text=[answered, escalated],
                 textposition='auto'
             )
         ])
@@ -1251,9 +1259,10 @@ with tab5:
     with col1:
         # Category Breakdown
         st.subheader("Category Breakdown")
+        categories = analytics.get('categories', {'Billing': 0, 'Technical': 0, 'General': 0})
         category_df = pd.DataFrame({
-            'Category': list(analytics['categories'].keys()),
-            'Count': list(analytics['categories'].values())
+            'Category': list(categories.keys()),
+            'Count': list(categories.values())
         })
         
         fig_category = px.bar(
