@@ -1,0 +1,14 @@
+streamlit
+pandas
+numpy
+python-dateutil
+pytz
+PyPDF2
+python-docx
+beautifulsoup4
+requests
+html5lib
+lxml
+plotly
+altair
+sqlite3
