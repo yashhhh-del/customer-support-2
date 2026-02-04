@@ -466,15 +466,15 @@ if 'whatsapp_messages' not in st.session_state:
     st.session_state.whatsapp_messages = []
 if 'gmail_config' not in st.session_state:
     st.session_state.gmail_config = {
-        'email': 'support@yourcompany.com',
+        'email': 'Callistoitsolutions1@gmail.com',
         'smtp_server': 'smtp.gmail.com',
         'smtp_port': 587,
         'imap_server': 'imap.gmail.com'
     }
 if 'whatsapp_config' not in st.session_state:
     st.session_state.whatsapp_config = {
-        'phone_number': '+1234567890',
-        'wa_link': 'https://wa.me/1234567890'
+        'phone_number': '+917057205423',
+        'wa_link': 'https://wa.me/917057205423'
     }
 if 'kb_processed' not in st.session_state:
     st.session_state.kb_processed = False
