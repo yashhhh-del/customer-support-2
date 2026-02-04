@@ -1014,30 +1014,97 @@ if st.session_state.demo_mode:
     </div>
     """, unsafe_allow_html=True)
 
-# Contact banner with JavaScript for cross-platform email support
-st.markdown(f"""
+# Contact banner with clickable email and WhatsApp
+import streamlit.components.v1 as components
+
+contact_html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.contact-banner {{
+    background: linear-gradient(135deg, #0066CC 0%, #00A86B 100%);
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}}
+
+.contact-card {{
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    min-width: 280px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}}
+
+.contact-card:hover {{
+    transform: translateY(-8px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}}
+
+.contact-card h4 {{
+    color: #003D7A;
+    margin-top: 0;
+    font-weight: 700;
+}}
+
+.contact-card p {{
+    color: #212529;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 10px 0;
+}}
+
+.email-button {{
+    background-color: #0066CC;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-block;
+}}
+
+.whatsapp-button {{
+    background-color: #25D366;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-block;
+}}
+</style>
+</head>
+<body>
+
 <div class="contact-banner">
     <h3 style='color: white; text-align: center; margin-bottom: 20px; font-size: 1.8rem;'>
         📞 Get Support Instantly
     </h3>
     <div style='display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;'>
         <!-- Email Support Card -->
-        <div class="contact-card" onclick="openEmail()" style="cursor: pointer;">
+        <div class="contact-card" onclick="openEmail()">
             <h4>📧 Email Support</h4>
             <p>{st.session_state.gmail_config['email']}</p>
             <small style='color: #6C757D;'>24/7 Response</small>
             <div style='margin-top: 10px;'>
-                <span class="email-button" style="font-size: 0.9rem; padding: 8px 16px;">✉️ Send Email</span>
+                <span class="email-button">✉️ Send Email</span>
             </div>
         </div>
         
         <!-- WhatsApp Support Card -->
-        <div class="contact-card" onclick="openWhatsApp()" style="cursor: pointer;">
+        <div class="contact-card" onclick="openWhatsApp()">
             <h4>💬 WhatsApp Support</h4>
             <p>{st.session_state.whatsapp_config['phone_number']}</p>
             <small style='color: #6C757D;'>Instant Messaging</small>
             <div style='margin-top: 10px;'>
-                <span class="whatsapp-button" style="font-size: 0.9rem; padding: 8px 16px;">💬 Open WhatsApp</span>
+                <span class="whatsapp-button">💬 Open WhatsApp</span>
             </div>
         </div>
     </div>
@@ -1049,25 +1116,15 @@ function openEmail() {{
     const subject = 'Support Request - Customer Inquiry';
     const body = 'Hello Support Team,%0D%0A%0D%0AI need assistance with:%0D%0A%0D%0A[Please describe your issue here]%0D%0A%0D%0AThank you!';
     
-    // Try multiple methods for maximum compatibility
+    const gmailUrl = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + email + '&su=' + encodeURIComponent(subject) + '&body=' + body;
+    const mailtoUrl = 'mailto:' + email + '?subject=' + encodeURIComponent(subject) + '&body=' + body;
     
-    // Method 1: Try Gmail web (works on all platforms)
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${{email}}&su=${{encodeURIComponent(subject)}}&body=${{body}}`;
-    
-    // Method 2: Mailto fallback
-    const mailtoUrl = `mailto:${{email}}?subject=${{encodeURIComponent(subject)}}&body=${{body}}`;
-    
-    // Check if on mobile or desktop
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
     if (isMobile) {{
-        // On mobile: Try Gmail app first, then mailto
         window.location.href = mailtoUrl;
     }} else {{
-        // On desktop: Open Gmail in new tab
         const newWindow = window.open(gmailUrl, '_blank');
-        
-        // If popup blocked, try mailto
         if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {{
             window.location.href = mailtoUrl;
         }}
@@ -1077,12 +1134,16 @@ function openEmail() {{
 function openWhatsApp() {{
     const phone = '{st.session_state.whatsapp_config['phone_number'].replace('+', '').replace('-', '').replace(' ', '')}';
     const message = 'Hello! I need support.';
-    const whatsappUrl = `https://wa.me/${{phone}}?text=${{encodeURIComponent(message)}}`;
-    
+    const whatsappUrl = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
     window.open(whatsappUrl, '_blank');
 }}
 </script>
-""", unsafe_allow_html=True)
+
+</body>
+</html>
+"""
+
+components.html(contact_html, height=300)
 
 # Channel metrics
 st.markdown("### 📊 Channel Overview")
